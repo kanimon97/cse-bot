@@ -6,11 +6,13 @@ import WelcomeScreen from './components/WelcomeScreen';
 import ChatHistory from './components/ChatHistory';
 import { Message } from './types';
 import { sendMessageToGemini } from './services/geminiService';
+import { useConversationManager } from './hooks/useConversationManager';
 import { Bot } from 'lucide-react';
 
 const App: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { messages, addMessage, clearHistory, getApiHistory } = useConversationManager();
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
   const [historyOpen, setHistoryOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -20,7 +22,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading]);
+  }, [messages, isLoading, loadingMessage]);
 
   const handleSend = async (text: string) => {
     // Add user message
@@ -30,17 +32,18 @@ const App: React.FC = () => {
       content: text,
       timestamp: new Date()
     };
-    setMessages(prev => [...prev, userMsg]);
+    addMessage(userMsg);
     setIsLoading(true);
+    setLoadingMessage('Fetching CSE data');
 
-    // Prepare history for API
-    const apiHistory = messages.map(m => ({
-      role: m.role === 'user' ? 'user' : 'model',
-      parts: [{ text: m.content }]
-    }));
+    // Get conversation history in API format
+    const apiHistory = getApiHistory();
 
     // Call API (or mock)
     try {
+      // Update loading message before calling Gemini
+      setLoadingMessage('Analyzing');
+      
       const response = await sendMessageToGemini(text, apiHistory);
       
       const aiMsg: Message = {
@@ -48,26 +51,38 @@ const App: React.FC = () => {
         role: 'ai',
         content: response.text,
         timestamp: new Date(),
-        stockData: response.stockData
+        stockData: response.stockData,
+        isError: false
       };
       
-      setMessages(prev => [...prev, aiMsg]);
+      addMessage(aiMsg);
     } catch (error) {
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'ai',
         content: "I apologize, but I encountered an error while processing your request. Please try again.",
-        timestamp: new Date()
+        timestamp: new Date(),
+        isError: true
       };
-      setMessages(prev => [...prev, errorMsg]);
+      addMessage(errorMsg);
     } finally {
       setIsLoading(false);
+      setLoadingMessage('');
+    }
+  };
+
+  const handleRetry = () => {
+    // Find the last user message and resend it
+    const lastUserMessage = [...messages].reverse().find(msg => msg.role === 'user');
+    if (lastUserMessage) {
+      handleSend(lastUserMessage.content);
     }
   };
 
   const handleNewChat = () => {
-    setMessages([]);
+    clearHistory();
     setIsLoading(false);
+    setLoadingMessage('');
   };
 
   return (
@@ -83,27 +98,27 @@ const App: React.FC = () => {
         onNewChat={handleNewChat}
       />
 
-      <main className="flex-1 overflow-y-auto relative scroll-smooth">
-        <div className="max-w-3xl mx-auto px-4 py-8 min-h-full flex flex-col">
+      <main className="flex-1 overflow-y-auto relative scroll-smooth pb-2">
+        <div className="max-w-3xl mx-auto px-4 py-8 min-h-full flex flex-col pb-32">
           {messages.length === 0 ? (
-            <div className="flex-1 flex flex-col justify-center">
+            <div className="flex-1 flex flex-col justify-center pb-24">
                <WelcomeScreen onQuickAction={handleSend} />
             </div>
           ) : (
-            <div className="flex flex-col pb-4">
+            <div className="flex flex-col">
               {messages.map((msg) => (
-                <ChatMessage key={msg.id} message={msg} />
+                <ChatMessage key={msg.id} message={msg} onRetry={msg.isError ? handleRetry : undefined} />
               ))}
               
               {/* Loading Indicator */}
               {isLoading && (
-                <div className="flex w-full justify-start mb-6 slide-up">
-                  <div className="flex max-w-[80%] flex-row gap-3 items-center">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm ring-2 ring-blue-50">
-                      <Bot className="w-5 h-5 text-white" />
+                <div className="flex w-full justify-start mb-6 slide-up px-2 sm:px-0">
+                  <div className="flex max-w-[95%] sm:max-w-[80%] flex-row gap-2 sm:gap-3 items-center">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm ring-2 ring-blue-50">
+                      <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     </div>
-                    <div className="bg-white border border-gray-200 px-5 py-4 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1.5">
-                      <span className="text-sm text-gray-500 font-medium mr-2">Analyzing CSE data</span>
+                    <div className="bg-white border border-gray-200 px-4 py-3 sm:px-5 sm:py-4 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1.5">
+                      <span className="text-sm text-gray-500 font-medium mr-2">{loadingMessage}</span>
                       <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
                       <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce bounce-delay-1"></div>
                       <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce bounce-delay-2"></div>

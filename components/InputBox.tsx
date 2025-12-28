@@ -36,7 +36,7 @@ const InputBox: React.FC<InputBoxProps> = ({ onSend, isLoading }) => {
   }, [text]);
 
   return (
-    <div className="sticky bottom-0 left-0 right-0 p-4 border-t border-gray-200/50 bg-white/80 backdrop-blur-xl z-40">
+    <div className="sticky bottom-0 left-0 right-0 p-3 sm:p-4 border-t border-gray-200/50 bg-white/95 backdrop-blur-xl z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
       <div className="max-w-3xl mx-auto relative">
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden focus-within:ring-2 focus-within:ring-blue-100 transition-shadow duration-200">
           <textarea
@@ -45,33 +45,41 @@ const InputBox: React.FC<InputBoxProps> = ({ onSend, isLoading }) => {
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask about JKH, Dialog, or market trends..."
-            className="w-full px-4 py-3 pb-12 bg-transparent border-none focus:ring-0 resize-none text-gray-800 placeholder-gray-400 text-base max-h-[150px] min-h-[56px]"
+            className="w-full px-3 sm:px-4 py-3 pb-14 sm:pb-12 bg-transparent border-none focus:ring-0 focus:outline-none resize-none text-gray-800 placeholder-gray-400 text-base max-h-[150px] min-h-[56px]"
             rows={1}
             disabled={isLoading}
+            inputMode="text"
+            enterKeyHint="send"
           />
           
           {/* Quick Actions & Send Button Bar */}
-          <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center">
+          <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center gap-2">
             
-            <div className="flex items-center gap-1 pl-1">
+            <div className="flex items-center gap-0.5 sm:gap-1 pl-0.5 sm:pl-1 flex-shrink-0">
                <button 
-                  className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors" 
+                  className="p-2.5 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center flex-shrink-0" 
                   title="Request Chart"
                   onClick={() => setText("Show me the chart for ")}
+                  type="button"
+                  disabled={isLoading}
                >
                   <BarChart3 className="w-5 h-5" />
                </button>
                <button 
-                  className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-full transition-colors" 
+                  className="p-2.5 sm:p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-full transition-colors min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center flex-shrink-0" 
                   title="Top Movers"
                   onClick={() => onSend("What are the top gainers today?")}
+                  type="button"
+                  disabled={isLoading}
                >
                   <TrendingUp className="w-5 h-5" />
                </button>
                <button 
-                  className="p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-full transition-colors" 
+                  className="p-2.5 sm:p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-full transition-colors min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center flex-shrink-0" 
                   title="Set Alert"
                   onClick={() => setText("Set a price alert for ")}
+                  type="button"
+                  disabled={isLoading}
                >
                   <Bell className="w-5 h-5" />
                </button>
@@ -80,7 +88,8 @@ const InputBox: React.FC<InputBoxProps> = ({ onSend, isLoading }) => {
             <button
               onClick={handleSubmit}
               disabled={!text.trim() || isLoading}
-              className={`p-2.5 rounded-xl flex items-center justify-center transition-all duration-200
+              type="button"
+              className={`p-3 sm:p-2.5 rounded-xl flex items-center justify-center transition-all duration-200 min-w-[44px] min-h-[44px] flex-shrink-0
                 ${text.trim() && !isLoading
                   ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md hover:shadow-lg hover:scale-105 active:scale-95'
                   : 'bg-gray-100 text-gray-300 cursor-not-allowed'
@@ -91,7 +100,7 @@ const InputBox: React.FC<InputBoxProps> = ({ onSend, isLoading }) => {
           </div>
         </div>
         
-        <div className="text-center mt-2">
+        <div className="text-center mt-2 px-2">
             <span className="text-[10px] text-gray-400">AI can make mistakes. Verify important financial data.</span>
         </div>
       </div>

@@ -18,6 +18,7 @@ export interface Message {
   timestamp: Date;
   stockData?: StockData;
   isLoading?: boolean;
+  isError?: boolean;
 }
 
 export interface ChatSession {

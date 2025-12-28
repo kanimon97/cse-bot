@@ -56,14 +56,15 @@ const Header: React.FC<HeaderProps> = ({ onToggleHistory, onNewChat }) => {
           </div>
 
           {/* User Avatar */}
-          <button className="w-9 h-9 rounded-full bg-gradient-to-tr from-gray-100 to-gray-200 border border-gray-200 flex items-center justify-center hover:ring-2 hover:ring-offset-2 hover:ring-blue-50 transition-all ml-2">
+          <button className="w-10 h-10 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-gray-100 to-gray-200 border border-gray-200 flex items-center justify-center hover:ring-2 hover:ring-offset-2 hover:ring-blue-50 transition-all ml-2 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0">
              <User className="w-5 h-5 text-gray-500" />
           </button>
 
           {/* Mobile Menu Toggle */}
           <button 
-            className="md:hidden p-2 text-gray-500"
+            className="md:hidden p-2 text-gray-500 min-w-[44px] min-h-[44px] flex items-center justify-center"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -72,19 +73,19 @@ const Header: React.FC<HeaderProps> = ({ onToggleHistory, onNewChat }) => {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-16 left-0 right-0 bg-white border-b border-gray-200 shadow-lg p-4 flex flex-col gap-2 animate-in slide-in-from-top-4 duration-200 z-50">
+        <div className="md:hidden absolute top-16 left-0 right-0 bg-white border-b border-gray-200 shadow-lg p-4 flex flex-col gap-2 animate-in slide-in-from-top-4 duration-200 z-[45]">
           <button 
             onClick={() => { onToggleHistory(); setMobileMenuOpen(false); }}
-            className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 text-gray-700"
+            className="flex items-center gap-3 p-4 rounded-xl hover:bg-gray-50 text-gray-700 min-h-[44px] text-left"
           >
-            <PanelLeft className="w-5 h-5" />
+            <PanelLeft className="w-5 h-5 flex-shrink-0" />
             <span className="font-medium">History</span>
           </button>
           <button 
             onClick={() => { onNewChat(); setMobileMenuOpen(false); }}
-            className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 text-blue-600"
+            className="flex items-center gap-3 p-4 rounded-xl hover:bg-blue-50 text-blue-600 min-h-[44px] text-left"
           >
-            <PlusCircle className="w-5 h-5" />
+            <PlusCircle className="w-5 h-5 flex-shrink-0" />
             <span className="font-medium">New Chat</span>
           </button>
         </div>

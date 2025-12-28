@@ -7,10 +7,12 @@ interface WelcomeScreenProps {
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onQuickAction }) => {
   const suggestions = [
-    "How is JKH performing today?",
-    "Top gainers in banking sector",
-    "Analyze Dialog's performance",
-    "What is the current ASPI?"
+    "What's JKH trading at?",
+    "Show me top gainers today",
+    "Compare JKH vs Dialog",
+    "How's the banking sector doing?",
+    "Explain what John Keells does",
+    "What's the current ASPI?"
   ];
 
   return (
